@@ -13,17 +13,17 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>코브라 게임 (Snake Game)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수박 게임</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 <style>
   :root {
-    --bg: #0f1117;
-    --panel: #1a1d29;
-    --accent: #4ade80;
-    --accent2: #22c55e;
-    --food: #f87171;
-    --grid: #1e2230;
-    --text: #e5e7eb;
-    --muted: #8b8fa3;
+    --bg: #fdf6e3;
+    --panel: #fffaf0;
+    --line: #e8dcc0;
+    --text: #5a4a32;
+    --muted: #a99a7a;
+    --accent: #ff6b6b;
   }
   * { box-sizing: border-box; }
   body {
@@ -33,49 +33,60 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 50% 0%, #1a1e2e, var(--bg));
+    background: radial-gradient(circle at 50% 0%, #fffdf7, var(--bg));
     font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     color: var(--text);
-    padding: 20px;
+    padding: 16px;
   }
   h1 {
-    margin: 0 0 4px;
-    font-size: 28px;
-    letter-spacing: 2px;
-    background: linear-gradient(90deg, var(--accent), #60a5fa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    margin: 0 0 2px;
+    font-size: 26px;
+    letter-spacing: 1px;
   }
   .subtitle {
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     font-size: 13px;
   }
   .hud {
     display: flex;
-    gap: 24px;
-    margin-bottom: 12px;
+    gap: 22px;
+    margin-bottom: 10px;
     font-size: 15px;
+    align-items: center;
   }
-  .hud span { color: var(--accent); font-weight: bold; }
+  .hud b { color: var(--accent); }
+  .next-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .next-circle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid rgba(0,0,0,0.15);
+  }
   .board-wrap {
     position: relative;
     background: var(--panel);
-    padding: 12px;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 0 1px #2a2f42;
+    padding: 10px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(90,74,50,0.18), inset 0 0 0 1px var(--line);
   }
   canvas {
     display: block;
-    background: var(--grid);
-    border-radius: 8px;
+    background: linear-gradient(180deg, #fffef9, #fbf3df);
+    border-radius: 10px;
+    cursor: pointer;
+    touch-action: none;
   }
   .overlay {
     position: absolute;
-    inset: 12px;
-    background: rgba(15, 17, 23, 0.88);
-    border-radius: 8px;
+    inset: 10px;
+    background: rgba(253, 246, 227, 0.92);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,84 +95,59 @@
     padding: 20px;
   }
   .overlay.hidden { display: none; }
-  .overlay h2 {
-    margin: 0 0 8px;
-    font-size: 24px;
-    color: var(--accent);
-  }
-  .overlay p {
-    color: var(--muted);
-    margin: 4px 0 16px;
-    font-size: 14px;
-    line-height: 1.6;
-  }
+  .overlay h2 { margin: 0 0 8px; font-size: 24px; color: var(--accent); }
+  .overlay p { color: var(--muted); margin: 4px 0 16px; font-size: 14px; line-height: 1.6; max-width: 280px; }
   button {
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-    color: #0f1117;
+    background: linear-gradient(90deg, #ff8787, var(--accent));
+    color: #fff;
     border: none;
-    padding: 10px 24px;
+    padding: 10px 26px;
     border-radius: 999px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(74, 222, 128, 0.35);
-  }
-  .controls-info {
-    margin-top: 14px;
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,107,107,0.35); }
+  .info {
+    margin-top: 12px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12.5px;
     text-align: center;
     line-height: 1.6;
+    max-width: 420px;
   }
-  .keycap {
+  .fruit-chain {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .fruit-chain span {
+    width: 16px; height: 16px;
+    border-radius: 50%;
     display: inline-block;
-    background: #262b3d;
-    border: 1px solid #3a3f56;
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin: 0 2px;
-    font-family: monospace;
-    color: var(--text);
-  }
-  .mobile-controls {
-    display: none;
-    margin-top: 16px;
-    grid-template-columns: repeat(3, 56px);
-    grid-template-rows: repeat(3, 56px);
-    gap: 6px;
-    user-select: none;
-  }
-  .mobile-controls button {
-    width: 56px;
-    height: 56px;
-    padding: 0;
-    font-size: 20px;
-    border-radius: 12px;
-  }
-  @media (max-width: 640px) {
-    .mobile-controls { display: grid; }
+    border: 1px solid rgba(0,0,0,0.15);
   }
 </style>
 </head>
 <body>
 
-<h1>🐍 코브라 게임</h1>
-<div class="subtitle">화살표 키 또는 WASD로 조작하세요</div>
+<h1>🍉 수박 게임</h1>
+<div class="subtitle">같은 과일을 합쳐서 수박을 만들어보세요!</div>
 
 <div class="hud">
-  <div>점수: <span id="score">0</span></div>
-  <div>최고 점수: <span id="highscore">0</span></div>
+  <div>점수: <b id="score">0</b></div>
+  <div>최고점수: <b id="highscore">0</b></div>
+  <div class="next-preview">다음: <span class="next-circle" id="nextCircle"></span></div>
 </div>
 
 <div class="board-wrap">
-  <canvas id="game" width="480" height="480"></canvas>
+  <canvas id="game" width="420" height="580"></canvas>
   <div class="overlay" id="startOverlay">
-    <h2>코브라 게임</h2>
-    <p>먹이를 먹고 몸을 키우세요.<br>벽이나 자신의 몸에 부딪히면 게임이 끝납니다.</p>
+    <h2>수박 게임</h2>
+    <p>클릭 또는 탭으로 과일을 떨어뜨리고,<br>같은 과일끼리 만나면 합쳐집니다.<br>맨 위 선을 넘으면 게임 오버!</p>
     <button id="startBtn">게임 시작</button>
   </div>
   <div class="overlay hidden" id="gameOverOverlay">
@@ -171,241 +157,306 @@
   </div>
 </div>
 
-<div class="controls-info">
-  <span class="keycap">↑</span><span class="keycap">↓</span><span class="keycap">←</span><span class="keycap">→</span>
-  또는
-  <span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span>
-  &nbsp;·&nbsp; 일시정지: <span class="keycap">Space</span>
-</div>
-
-<div class="mobile-controls" id="mobileControls">
-  <span></span><button data-dir="up">▲</button><span></span>
-  <button data-dir="left">◀</button><span></span><button data-dir="right">▶</button>
-  <span></span><button data-dir="down">▼</button><span></span>
+<div class="fruit-chain" id="fruitChain"></div>
+<div class="info">
+  마우스를 움직여 위치를 정하고 클릭(또는 탭)하면 과일이 떨어집니다.<br>
+  같은 크기의 과일 두 개가 부딪히면 다음 단계의 더 큰 과일로 합쳐져요.
 </div>
 
 <script>
 (function() {
+  const { Engine, Render, Runner, World, Bodies, Body, Events, Composite, Common } = Matter;
+
+  // 과일 단계 정의: 이름, 반지름, 색상
+  const FRUITS = [
+    { name: '체리',   r: 14, color: '#e63946', score: 1  },
+    { name: '딸기',   r: 20, color: '#ff6b81', score: 3  },
+    { name: '포도',   r: 27, color: '#8e44ad', score: 6  },
+    { name: '귤',     r: 34, color: '#ff9f43', score: 10 },
+    { name: '감',     r: 42, color: '#ff7f11', score: 15 },
+    { name: '사과',   r: 50, color: '#e74c3c', score: 21 },
+    { name: '배',     r: 60, color: '#c0e578', score: 28 },
+    { name: '복숭아', r: 70, color: '#ffb3ba', score: 36 },
+    { name: '파인애플', r: 82, color: '#f4d35e', score: 45 },
+    { name: '멜론',   r: 96, color: '#95d5b2', score: 55 },
+    { name: '수박',   r: 112, color: '#2d6a4f', score: 66 }
+  ];
+
   const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  const cell = 20;
-  const cols = canvas.width / cell;
-  const rows = canvas.height / cell;
+  const W = canvas.width, H = canvas.height;
+  const WALL = 14;
+  const DROP_Y = 60;
+  const DANGER_Y = 100;
 
   const scoreEl = document.getElementById('score');
   const highscoreEl = document.getElementById('highscore');
+  const nextCircle = document.getElementById('nextCircle');
   const startOverlay = document.getElementById('startOverlay');
   const gameOverOverlay = document.getElementById('gameOverOverlay');
   const finalScoreText = document.getElementById('finalScoreText');
   const startBtn = document.getElementById('startBtn');
   const restartBtn = document.getElementById('restartBtn');
-  const mobileControls = document.getElementById('mobileControls');
+  const fruitChainEl = document.getElementById('fruitChain');
 
-  let snake, dir, nextDir, food, score, gameLoop, speed, running, paused;
+  // fruit chain preview
+  FRUITS.forEach(f => {
+    const s = document.createElement('span');
+    s.style.background = f.color;
+    s.title = f.name;
+    fruitChainEl.appendChild(s);
+  });
+
   let highscore = 0;
-  try {
-    highscore = parseInt(localStorage.getItem('snake_highscore') || '0', 10);
-  } catch(e) { highscore = 0; }
+  try { highscore = parseInt(localStorage.getItem('suika_highscore') || '0', 10); } catch(e) {}
   highscoreEl.textContent = highscore;
 
-  function initState() {
-    snake = [
-      { x: 8, y: 12 },
-      { x: 7, y: 12 },
-      { x: 6, y: 12 }
-    ];
-    dir = { x: 1, y: 0 };
-    nextDir = { x: 1, y: 0 };
-    score = 0;
-    speed = 130;
-    paused = false;
-    scoreEl.textContent = score;
-    placeFood();
+  let engine, world, render, runner;
+  let score = 0;
+  let running = false;
+  let currentFruit = null; // body waiting to drop
+  let currentIndex = 0;
+  let nextIndex = 0;
+  let canDrop = true;
+  let mouseX = W / 2;
+  let dangerTimer = null;
+  let dangerFrames = 0;
+
+  function randomStartIndex() {
+    return Math.floor(Math.random() * 5); // only smallest 5 fruits spawn
   }
 
-  function placeFood() {
-    let valid = false;
-    while (!valid) {
-      food = {
-        x: Math.floor(Math.random() * cols),
-        y: Math.floor(Math.random() * rows)
-      };
-      valid = !snake.some(s => s.x === food.x && s.y === food.y);
-    }
-  }
+  function setup() {
+    engine = Engine.create();
+    world = engine.world;
+    engine.gravity.y = 1;
 
-  function drawCell(x, y, color, radius) {
-    ctx.fillStyle = color;
-    const px = x * cell, py = y * cell;
-    const r = radius || 4;
-    ctx.beginPath();
-    ctx.moveTo(px + r, py);
-    ctx.arcTo(px + cell, py, px + cell, py + cell, r);
-    ctx.arcTo(px + cell, py + cell, px, py + cell, r);
-    ctx.arcTo(px, py + cell, px, py, r);
-    ctx.arcTo(px, py, px + cell, py, r);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // grid background subtle lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-    for (let i = 0; i <= cols; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * cell, 0);
-      ctx.lineTo(i * cell, canvas.height);
-      ctx.stroke();
-    }
-    for (let j = 0; j <= rows; j++) {
-      ctx.beginPath();
-      ctx.moveTo(0, j * cell);
-      ctx.lineTo(canvas.width, j * cell);
-      ctx.stroke();
-    }
-
-    // food
-    ctx.save();
-    ctx.shadowColor = '#f87171';
-    ctx.shadowBlur = 12;
-    drawCell(food.x, food.y, '#f87171', 8);
-    ctx.restore();
-
-    // snake
-    snake.forEach((seg, i) => {
-      const isHead = i === 0;
-      const color = isHead ? '#4ade80' : `rgba(74, 222, 128, ${1 - i * 0.03})`;
-      drawCell(seg.x, seg.y, isHead ? '#4ade80' : '#34d399', isHead ? 6 : 4);
+    render = Render.create({
+      canvas: canvas,
+      engine: engine,
+      options: {
+        width: W,
+        height: H,
+        wireframes: false,
+        background: 'transparent'
+      }
     });
 
-    if (paused) {
-      ctx.fillStyle = 'rgba(15,17,23,0.6)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#e5e7eb';
-      ctx.font = 'bold 24px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('일시정지', canvas.width / 2, canvas.height / 2);
-    }
+    // walls
+    const wallOptions = { isStatic: true, restitution: 0.2, render: { fillStyle: '#e8dcc0' } };
+    World.add(world, [
+      Bodies.rectangle(W/2, H + WALL/2, W, WALL, wallOptions), // floor
+      Bodies.rectangle(-WALL/2, H/2, WALL, H, wallOptions),     // left
+      Bodies.rectangle(W + WALL/2, H/2, WALL, H, wallOptions)   // right
+    ]);
+
+    Render.run(render);
+    runner = Runner.create();
+    Runner.run(runner, engine);
+
+    Events.on(engine, 'collisionStart', handleCollisions);
+    Events.on(render, 'afterRender', drawOverlayElements);
+
+    score = 0;
+    scoreEl.textContent = 0;
+    canDrop = true;
+    dangerFrames = 0;
+
+    currentIndex = randomStartIndex();
+    nextIndex = randomStartIndex();
+    updateNextPreview();
+    spawnCurrentFruit();
+
+    running = true;
   }
 
-  function step() {
-    if (paused) return;
-    dir = nextDir;
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+  function teardown() {
+    if (!render) return;
+    Render.stop(render);
+    Runner.stop(runner);
+    World.clear(world, false);
+    Engine.clear(engine);
+    Events.off(engine, 'collisionStart', handleCollisions);
+    Events.off(render, 'afterRender', drawOverlayElements);
+    render.canvas = null;
+    render.context = null;
+    render.textures = {};
+  }
 
-    // wall collision
-    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
-      return endGame();
-    }
-    // self collision
-    if (snake.some(s => s.x === head.x && s.y === head.y)) {
-      return endGame();
-    }
-
-    snake.unshift(head);
-
-    if (head.x === food.x && head.y === food.y) {
-      score += 10;
-      scoreEl.textContent = score;
-      placeFood();
-      if (speed > 60) {
-        speed -= 3;
-        restartLoop();
+  function fruitBody(x, y, index) {
+    const f = FRUITS[index];
+    const body = Bodies.circle(x, y, f.r, {
+      restitution: 0.15,
+      friction: 0.4,
+      frictionStatic: 0.6,
+      density: 0.001,
+      render: {
+        fillStyle: f.color,
+        strokeStyle: 'rgba(0,0,0,0.15)',
+        lineWidth: 2
       }
-    } else {
-      snake.pop();
+    });
+    body.fruitIndex = index;
+    body.isMerging = false;
+    return body;
+  }
+
+  function spawnCurrentFruit() {
+    currentFruit = fruitBody(mouseX, DROP_Y, currentIndex);
+    currentFruit.isStatic = true;
+    currentFruit.isSensor = true;
+    World.add(world, currentFruit);
+  }
+
+  function updateNextPreview() {
+    nextCircle.style.background = FRUITS[nextIndex].color;
+    nextCircle.title = FRUITS[nextIndex].name;
+  }
+
+  function clampX(x, r) {
+    return Math.max(WALL + r, Math.min(W - WALL - r, x));
+  }
+
+  function onMove(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    const scale = W / rect.width;
+    mouseX = clampX((clientX - rect.left) * scale, currentFruit ? FRUITS[currentFruit.fruitIndex].r : 20);
+    if (currentFruit && currentFruit.isStatic) {
+      Body.setPosition(currentFruit, { x: mouseX, y: DROP_Y });
     }
-
-    draw();
   }
 
-  function restartLoop() {
-    if (gameLoop) clearInterval(gameLoop);
-    gameLoop = setInterval(step, speed);
+  function doDrop() {
+    if (!running || !canDrop || !currentFruit) return;
+    canDrop = false;
+    const f = currentFruit;
+    Body.setStatic(f, false);
+    f.isSensor = false;
+    currentFruit = null;
+
+    currentIndex = nextIndex;
+    nextIndex = randomStartIndex();
+    updateNextPreview();
+
+    setTimeout(() => {
+      if (!running) return;
+      spawnCurrentFruit();
+      canDrop = true;
+    }, 420);
   }
+
+  canvas.addEventListener('mousemove', (e) => onMove(e.clientX));
+  canvas.addEventListener('click', () => doDrop());
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches[0]) onMove(e.touches[0].clientX);
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener('touchend', (e) => {
+    doDrop();
+    e.preventDefault();
+  }, { passive: false });
+
+  const merging = new Set();
+
+  function handleCollisions(event) {
+    event.pairs.forEach(pair => {
+      const a = pair.bodyA, b = pair.bodyB;
+      if (a.fruitIndex === undefined || b.fruitIndex === undefined) return;
+      if (a.isSensor || b.isSensor) return;
+      if (a.fruitIndex !== b.fruitIndex) return;
+      if (merging.has(a.id) || merging.has(b.id)) return;
+      if (a.fruitIndex >= FRUITS.length - 1) return; // already max (watermelon)
+
+      merging.add(a.id);
+      merging.add(b.id);
+
+      const newIndex = a.fruitIndex + 1;
+      const midX = (a.position.x + b.position.x) / 2;
+      const midY = (a.position.y + b.position.y) / 2;
+
+      World.remove(world, a);
+      World.remove(world, b);
+
+      const merged = fruitBody(midX, midY, newIndex);
+      World.add(world, merged);
+
+      score += FRUITS[newIndex].score;
+      scoreEl.textContent = score;
+
+      // little pop effect via scale animation
+      Body.scale(merged, 0.6, 0.6);
+      let scale = 0.6;
+      const grow = setInterval(() => {
+        scale += 0.08;
+        if (scale >= 1) {
+          Body.scale(merged, 1 / (scale - 0.08), 1 / (scale - 0.08));
+          clearInterval(grow);
+        } else {
+          Body.scale(merged, 1.08, 1.08);
+        }
+      }, 16);
+    });
+  }
+
+  function drawOverlayElements() {
+    if (!render.context) return;
+    const ctx = render.context;
+    // danger line
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,107,107,0.5)';
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(WALL, DANGER_Y);
+    ctx.lineTo(W - WALL, DANGER_Y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function checkGameOver() {
+    if (!running) return;
+    const bodies = Composite.allBodies(world).filter(b => b.fruitIndex !== undefined && !b.isSensor);
+    let overLine = false;
+    bodies.forEach(b => {
+      // only count if it has settled a bit (velocity low) to avoid false positive right after spawn
+      if (b.position.y - b.circleRadius < DANGER_Y && Math.abs(b.velocity.y) < 1.2) {
+        overLine = true;
+      }
+    });
+    if (overLine) {
+      dangerFrames++;
+    } else {
+      dangerFrames = 0;
+    }
+    if (dangerFrames > 90) { // ~1.5s sustained
+      endGame();
+    }
+  }
+
+  let gameOverCheckInterval = null;
 
   function endGame() {
     running = false;
-    clearInterval(gameLoop);
+    canDrop = false;
+    if (gameOverCheckInterval) clearInterval(gameOverCheckInterval);
     if (score > highscore) {
       highscore = score;
       highscoreEl.textContent = highscore;
-      try { localStorage.setItem('snake_highscore', highscore); } catch(e) {}
+      try { localStorage.setItem('suika_highscore', highscore); } catch(e) {}
     }
     finalScoreText.textContent = `점수: ${score}`;
     gameOverOverlay.classList.remove('hidden');
+    teardown();
   }
 
   function startGame() {
     startOverlay.classList.add('hidden');
     gameOverOverlay.classList.add('hidden');
-    initState();
-    draw();
-    running = true;
-    restartLoop();
+    setup();
+    gameOverCheckInterval = setInterval(checkGameOver, 16);
   }
-
-  function setDirection(dx, dy) {
-    // prevent reversing directly into itself
-    if (dx === -dir.x && dy === -dir.y) return;
-    if (dx === dir.x && dy === dir.y) return;
-    nextDir = { x: dx, y: dy };
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (!running && (e.code === 'Space' || e.key === 'Enter')) {
-      startGame();
-      return;
-    }
-    switch (e.key) {
-      case 'ArrowUp': case 'w': case 'W': setDirection(0, -1); e.preventDefault(); break;
-      case 'ArrowDown': case 's': case 'S': setDirection(0, 1); e.preventDefault(); break;
-      case 'ArrowLeft': case 'a': case 'A': setDirection(-1, 0); e.preventDefault(); break;
-      case 'ArrowRight': case 'd': case 'D': setDirection(1, 0); e.preventDefault(); break;
-      case ' ':
-        if (running) {
-          paused = !paused;
-          draw();
-        }
-        e.preventDefault();
-        break;
-    }
-  });
-
-  mobileControls.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const d = btn.dataset.dir;
-    if (d === 'up') setDirection(0, -1);
-    if (d === 'down') setDirection(0, 1);
-    if (d === 'left') setDirection(-1, 0);
-    if (d === 'right') setDirection(1, 0);
-  });
-
-  // swipe support
-  let touchStartX = 0, touchStartY = 0;
-  canvas.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-  canvas.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      setDirection(dx > 0 ? 1 : -1, 0);
-    } else {
-      setDirection(0, dy > 0 ? 1 : -1);
-    }
-  }, { passive: true });
 
   startBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', startGame);
-
-  // initial static draw
-  initState();
-  draw();
 })();
 </script>
 
