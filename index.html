@@ -14,79 +14,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>수박 게임</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<title>수박게임 - 과일 합치기</title>
 <style>
-  :root {
-    --bg: #fdf6e3;
-    --panel: #fffaf0;
-    --line: #e8dcc0;
-    --text: #5a4a32;
-    --muted: #a99a7a;
-    --accent: #ff6b6b;
-  }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 50% 0%, #fffdf7, var(--bg));
-    font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    color: var(--text);
+    background: linear-gradient(160deg, #2d1b3d 0%, #1a1030 50%, #0f0a1e 100%);
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    color: #fff;
     padding: 16px;
+    overflow-x: hidden;
   }
   h1 {
-    margin: 0 0 2px;
-    font-size: 26px;
-    letter-spacing: 1px;
+    font-size: 28px;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #ff6b9d, #ffd93d, #6bcf7f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 2px;
   }
   .subtitle {
-    color: var(--muted);
-    margin-bottom: 10px;
+    color: #b8a8d0;
     font-size: 13px;
+    margin-bottom: 14px;
   }
-  .hud {
+  .top-bar {
     display: flex;
-    gap: 22px;
-    margin-bottom: 10px;
-    font-size: 15px;
+    gap: 24px;
     align-items: center;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.06);
+    padding: 10px 22px;
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
   }
-  .hud b { color: var(--accent); }
-  .next-preview {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-  }
-  .next-circle {
-    width: 22px; height: 22px;
+  .stat { text-align: center; }
+  .stat .label { font-size: 11px; color: #b8a8d0; }
+  .stat .value { font-size: 20px; font-weight: bold; color: #ffd93d; }
+  .next-fruit-box { display: flex; align-items: center; gap: 8px; }
+  .next-fruit-box .label { font-size: 11px; color: #b8a8d0; }
+  #nextFruitCanvas {
+    background: rgba(255,255,255,0.08);
     border-radius: 50%;
-    display: inline-block;
-    border: 2px solid rgba(0,0,0,0.15);
   }
-  .board-wrap {
+  .game-wrap {
     position: relative;
-    background: var(--panel);
-    padding: 10px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(90,74,50,0.18), inset 0 0 0 1px var(--line);
+    padding: 4px;
+    background: linear-gradient(160deg, #ff9a56, #ff6b9d, #a56bff);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   }
-  canvas {
+  #gameCanvas {
     display: block;
-    background: linear-gradient(180deg, #fffef9, #fbf3df);
-    border-radius: 10px;
+    background: linear-gradient(180deg, #fff8ec 0%, #ffedd0 100%);
+    border-radius: 15px;
     cursor: pointer;
     touch-action: none;
   }
   .overlay {
     position: absolute;
-    inset: 10px;
-    background: rgba(253, 246, 227, 0.92);
-    border-radius: 10px;
+    inset: 4px;
+    background: rgba(15, 10, 30, 0.9);
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -95,59 +89,80 @@
     padding: 20px;
   }
   .overlay.hidden { display: none; }
-  .overlay h2 { margin: 0 0 8px; font-size: 24px; color: var(--accent); }
-  .overlay p { color: var(--muted); margin: 4px 0 16px; font-size: 14px; line-height: 1.6; max-width: 280px; }
+  .overlay h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+    color: #ffd93d;
+  }
+  .overlay p {
+    color: #d8c8f0;
+    font-size: 14px;
+    margin: 4px 0 18px;
+    line-height: 1.7;
+  }
   button {
-    background: linear-gradient(90deg, #ff8787, var(--accent));
-    color: #fff;
+    background: linear-gradient(90deg, #ff6b9d, #ffd93d);
+    color: #2d1b3d;
     border: none;
-    padding: 10px 26px;
+    padding: 12px 30px;
     border-radius: 999px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,107,107,0.35); }
-  .info {
-    margin-top: 12px;
-    color: var(--muted);
+  button:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+  }
+  .hint {
+    margin-top: 14px;
+    color: #b8a8d0;
     font-size: 12.5px;
     text-align: center;
     line-height: 1.6;
-    max-width: 420px;
   }
   .fruit-chain {
     display: flex;
-    justify-content: center;
     gap: 4px;
-    margin-top: 8px;
+    align-items: center;
+    margin-top: 10px;
     flex-wrap: wrap;
+    justify-content: center;
+    max-width: 480px;
   }
   .fruit-chain span {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    display: inline-block;
-    border: 1px solid rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
   }
+  .fruit-chain svg { display: block; }
 </style>
 </head>
 <body>
 
-<h1>🍉 수박 게임</h1>
+<h1>🍉 수박게임</h1>
 <div class="subtitle">같은 과일을 합쳐서 수박을 만들어보세요!</div>
 
-<div class="hud">
-  <div>점수: <b id="score">0</b></div>
-  <div>최고점수: <b id="highscore">0</b></div>
-  <div class="next-preview">다음: <span class="next-circle" id="nextCircle"></span></div>
+<div class="top-bar">
+  <div class="stat">
+    <div class="label">점수</div>
+    <div class="value" id="score">0</div>
+  </div>
+  <div class="stat">
+    <div class="label">최고점수</div>
+    <div class="value" id="highscore">0</div>
+  </div>
+  <div class="next-fruit-box">
+    <div class="label">다음</div>
+    <canvas id="nextFruitCanvas" width="50" height="50"></canvas>
+  </div>
 </div>
 
-<div class="board-wrap">
-  <canvas id="game" width="420" height="580"></canvas>
+<div class="game-wrap">
+  <canvas id="gameCanvas" width="420" height="560"></canvas>
   <div class="overlay" id="startOverlay">
-    <h2>수박 게임</h2>
-    <p>클릭 또는 탭으로 과일을 떨어뜨리고,<br>같은 과일끼리 만나면 합쳐집니다.<br>맨 위 선을 넘으면 게임 오버!</p>
+    <h2>수박게임</h2>
+    <p>같은 과일끼리 부딪히면 더 큰 과일로 합쳐져요.<br>과일이 위쪽 선을 넘으면 게임이 끝나요.<br>수박까지 만들어보세요!</p>
     <button id="startBtn">게임 시작</button>
   </div>
   <div class="overlay hidden" id="gameOverOverlay">
@@ -157,306 +172,463 @@
   </div>
 </div>
 
-<div class="fruit-chain" id="fruitChain"></div>
-<div class="info">
-  마우스를 움직여 위치를 정하고 클릭(또는 탭)하면 과일이 떨어집니다.<br>
-  같은 크기의 과일 두 개가 부딪히면 다음 단계의 더 큰 과일로 합쳐져요.
-</div>
+<div class="hint">클릭 또는 터치로 과일을 떨어뜨리세요 · 좌우로 움직여 위치를 조정하세요</div>
 
 <script>
 (function() {
-  const { Engine, Render, Runner, World, Bodies, Body, Events, Composite, Common } = Matter;
-
-  // 과일 단계 정의: 이름, 반지름, 색상
+  // ---------- 과일 정의 (사실적인 그라디언트 기반 SVG 스타일 렌더링) ----------
   const FRUITS = [
-    { name: '체리',   r: 14, color: '#e63946', score: 1  },
-    { name: '딸기',   r: 20, color: '#ff6b81', score: 3  },
-    { name: '포도',   r: 27, color: '#8e44ad', score: 6  },
-    { name: '귤',     r: 34, color: '#ff9f43', score: 10 },
-    { name: '감',     r: 42, color: '#ff7f11', score: 15 },
-    { name: '사과',   r: 50, color: '#e74c3c', score: 21 },
-    { name: '배',     r: 60, color: '#c0e578', score: 28 },
-    { name: '복숭아', r: 70, color: '#ffb3ba', score: 36 },
-    { name: '파인애플', r: 82, color: '#f4d35e', score: 45 },
-    { name: '멜론',   r: 96, color: '#95d5b2', score: 55 },
-    { name: '수박',   r: 112, color: '#2d6a4f', score: 66 }
+    { name: '체리',   radius: 16, color: ['#e0355f', '#8b0f2f'], score: 1,  leafColor: '#3a7d34' },
+    { name: '딸기',   radius: 22, color: ['#ff4d6d', '#c9184a'], score: 3,  leafColor: '#2e8b3d', seeds: true },
+    { name: '포도',   radius: 28, color: ['#8e5bc4', '#4a1e73'], score: 6,  leafColor: '#3a7d34' },
+    { name: '귤',     radius: 34, color: ['#ffb347', '#e67e22'], score: 10, leafColor: '#3a7d34' },
+    { name: '감',     radius: 40, color: ['#ff8c3a', '#d9601a'], score: 15, leafColor: '#6b4226' },
+    { name: '사과',   radius: 47, color: ['#ff5252', '#b71c1c'], score: 21, leafColor: '#2e8b3d' },
+    { name: '배',     radius: 55, color: ['#d4e157', '#8bab2f'], score: 28, leafColor: '#3a7d34' },
+    { name: '복숭아', radius: 63, color: ['#ffb6a3', '#ff7a5c'], score: 36, leafColor: '#2e8b3d' },
+    { name: '파인애플', radius: 72, color: ['#ffd54f', '#c98f0a'], score: 45, leafColor: '#2e8b3d', pineapple: true },
+    { name: '멜론',   radius: 82, color: ['#c5e17e', '#7ba03e'], score: 55, leafColor: '#3a7d34', melon: true },
+    { name: '수박',   radius: 95, color: ['#3fae4a', '#0e6b2c'], score: 66, watermelon: true }
   ];
 
-  const canvas = document.getElementById('game');
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  const WALL = 14;
-  const DROP_Y = 60;
-  const DANGER_Y = 100;
+  const DANGER_LINE = 90;
+
+  const nextCanvas = document.getElementById('nextFruitCanvas');
+  const nextCtx = nextCanvas.getContext('2d');
 
   const scoreEl = document.getElementById('score');
   const highscoreEl = document.getElementById('highscore');
-  const nextCircle = document.getElementById('nextCircle');
   const startOverlay = document.getElementById('startOverlay');
   const gameOverOverlay = document.getElementById('gameOverOverlay');
   const finalScoreText = document.getElementById('finalScoreText');
   const startBtn = document.getElementById('startBtn');
   const restartBtn = document.getElementById('restartBtn');
-  const fruitChainEl = document.getElementById('fruitChain');
-
-  // fruit chain preview
-  FRUITS.forEach(f => {
-    const s = document.createElement('span');
-    s.style.background = f.color;
-    s.title = f.name;
-    fruitChainEl.appendChild(s);
-  });
 
   let highscore = 0;
-  try { highscore = parseInt(localStorage.getItem('suika_highscore') || '0', 10); } catch(e) {}
+  try { highscore = parseInt(localStorage.getItem('watermelon_highscore') || '0', 10); } catch(e) {}
   highscoreEl.textContent = highscore;
 
-  let engine, world, render, runner;
-  let score = 0;
-  let running = false;
-  let currentFruit = null; // body waiting to drop
-  let currentIndex = 0;
-  let nextIndex = 0;
-  let canDrop = true;
-  let mouseX = W / 2;
-  let dangerTimer = null;
-  let dangerFrames = 0;
+  let fruits, score, running, dropX, currentType, nextType, dropCooldown, gravity, animId, dangerTimer;
 
-  function randomStartIndex() {
-    return Math.floor(Math.random() * 5); // only smallest 5 fruits spawn
+  const GRAVITY = 0.45;
+  const DAMPING = 0.72;
+  const WALL_DAMPING = 0.5;
+
+  function randomStartType() {
+    return Math.floor(Math.random() * 4); // 체리~귤 중 랜덤
   }
 
-  function setup() {
-    engine = Engine.create();
-    world = engine.world;
-    engine.gravity.y = 1;
-
-    render = Render.create({
-      canvas: canvas,
-      engine: engine,
-      options: {
-        width: W,
-        height: H,
-        wireframes: false,
-        background: 'transparent'
-      }
-    });
-
-    // walls
-    const wallOptions = { isStatic: true, restitution: 0.2, render: { fillStyle: '#e8dcc0' } };
-    World.add(world, [
-      Bodies.rectangle(W/2, H + WALL/2, W, WALL, wallOptions), // floor
-      Bodies.rectangle(-WALL/2, H/2, WALL, H, wallOptions),     // left
-      Bodies.rectangle(W + WALL/2, H/2, WALL, H, wallOptions)   // right
-    ]);
-
-    Render.run(render);
-    runner = Runner.create();
-    Runner.run(runner, engine);
-
-    Events.on(engine, 'collisionStart', handleCollisions);
-    Events.on(render, 'afterRender', drawOverlayElements);
-
+  function initState() {
+    fruits = [];
     score = 0;
-    scoreEl.textContent = 0;
-    canDrop = true;
-    dangerFrames = 0;
-
-    currentIndex = randomStartIndex();
-    nextIndex = randomStartIndex();
-    updateNextPreview();
-    spawnCurrentFruit();
-
-    running = true;
+    scoreEl.textContent = score;
+    dropX = W / 2;
+    currentType = randomStartType();
+    nextType = randomStartType();
+    dropCooldown = false;
+    dangerTimer = 0;
+    drawNextPreview();
   }
 
-  function teardown() {
-    if (!render) return;
-    Render.stop(render);
-    Runner.stop(runner);
-    World.clear(world, false);
-    Engine.clear(engine);
-    Events.off(engine, 'collisionStart', handleCollisions);
-    Events.off(render, 'afterRender', drawOverlayElements);
-    render.canvas = null;
-    render.context = null;
-    render.textures = {};
-  }
+  // ---------- 과일 그리기 (질감 있는 사실적 렌더링) ----------
+  function drawFruit(c, f, x, y, r, rotation) {
+    rotation = rotation || 0;
+    c.save();
+    c.translate(x, y);
+    c.rotate(rotation);
 
-  function fruitBody(x, y, index) {
-    const f = FRUITS[index];
-    const body = Bodies.circle(x, y, f.r, {
-      restitution: 0.15,
-      friction: 0.4,
-      frictionStatic: 0.6,
-      density: 0.001,
-      render: {
-        fillStyle: f.color,
-        strokeStyle: 'rgba(0,0,0,0.15)',
-        lineWidth: 2
-      }
-    });
-    body.fruitIndex = index;
-    body.isMerging = false;
-    return body;
-  }
+    // 그림자
+    c.save();
+    c.translate(2, 4);
+    c.beginPath();
+    c.arc(0, 0, r, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(0,0,0,0.15)';
+    c.fill();
+    c.restore();
 
-  function spawnCurrentFruit() {
-    currentFruit = fruitBody(mouseX, DROP_Y, currentIndex);
-    currentFruit.isStatic = true;
-    currentFruit.isSensor = true;
-    World.add(world, currentFruit);
-  }
+    // 본체 그라디언트
+    const grad = c.createRadialGradient(-r*0.35, -r*0.35, r*0.1, 0, 0, r*1.15);
+    grad.addColorStop(0, lighten(f.color[0], 35));
+    grad.addColorStop(0.45, f.color[0]);
+    grad.addColorStop(1, f.color[1]);
 
-  function updateNextPreview() {
-    nextCircle.style.background = FRUITS[nextIndex].color;
-    nextCircle.title = FRUITS[nextIndex].name;
-  }
-
-  function clampX(x, r) {
-    return Math.max(WALL + r, Math.min(W - WALL - r, x));
-  }
-
-  function onMove(clientX) {
-    const rect = canvas.getBoundingClientRect();
-    const scale = W / rect.width;
-    mouseX = clampX((clientX - rect.left) * scale, currentFruit ? FRUITS[currentFruit.fruitIndex].r : 20);
-    if (currentFruit && currentFruit.isStatic) {
-      Body.setPosition(currentFruit, { x: mouseX, y: DROP_Y });
+    c.beginPath();
+    if (f.name === '딸기') {
+      drawStrawberryShape(c, r);
+    } else {
+      c.arc(0, 0, r, 0, Math.PI * 2);
     }
+    c.fillStyle = grad;
+    c.fill();
+
+    // 수박 줄무늬
+    if (f.watermelon) {
+      c.save();
+      c.clip();
+      c.strokeStyle = 'rgba(10,60,20,0.55)';
+      c.lineWidth = r * 0.16;
+      for (let i = -5; i <= 5; i++) {
+        c.beginPath();
+        c.moveTo(i * r * 0.28, -r * 1.3);
+        c.quadraticCurveTo(i * r * 0.28 + r*0.15, 0, i * r * 0.28, r * 1.3);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // 멜론 그물무늬
+    if (f.melon) {
+      c.save();
+      c.clip();
+      c.strokeStyle = 'rgba(255,255,255,0.5)';
+      c.lineWidth = 1.3;
+      for (let i = -6; i <= 6; i++) {
+        c.beginPath();
+        c.moveTo(-r, i * r * 0.22);
+        c.bezierCurveTo(-r*0.3, i*r*0.22 + r*0.15, r*0.3, i*r*0.22 - r*0.15, r, i * r * 0.22);
+        c.stroke();
+      }
+      for (let i = -6; i <= 6; i++) {
+        c.beginPath();
+        c.moveTo(i * r * 0.22, -r);
+        c.bezierCurveTo(i*r*0.22 + r*0.15, -r*0.3, i*r*0.22 - r*0.15, r*0.3, i * r * 0.22, r);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // 파인애플 다이아몬드 패턴
+    if (f.pineapple) {
+      c.save();
+      c.clip();
+      c.strokeStyle = 'rgba(140,90,10,0.5)';
+      c.lineWidth = 1.5;
+      const step = r * 0.35;
+      for (let i = -8; i <= 8; i++) {
+        c.beginPath();
+        c.moveTo(i * step - r, -r);
+        c.lineTo(i * step + r, r);
+        c.stroke();
+        c.beginPath();
+        c.moveTo(i * step + r, -r);
+        c.lineTo(i * step - r, r);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // 딸기 씨
+    if (f.seeds) {
+      c.save();
+      c.clip();
+      c.fillStyle = '#ffe066';
+      for (let i = 0; i < 14; i++) {
+        const ang = (i / 14) * Math.PI * 2 + 0.3;
+        const rr = r * (0.4 + (i % 3) * 0.18);
+        const sx = Math.cos(ang) * rr * 0.8;
+        const sy = Math.sin(ang) * rr * 0.9;
+        c.beginPath();
+        c.ellipse(sx, sy, r*0.05, r*0.08, ang, 0, Math.PI*2);
+        c.fill();
+      }
+      c.restore();
+    }
+
+    // 광택 하이라이트
+    c.beginPath();
+    c.ellipse(-r*0.32, -r*0.38, r*0.32, r*0.2, -0.5, 0, Math.PI*2);
+    c.fillStyle = 'rgba(255,255,255,0.45)';
+    c.fill();
+
+    // 테두리
+    c.beginPath();
+    if (f.name === '딸기') {
+      drawStrawberryShape(c, r);
+    } else {
+      c.arc(0, 0, r, 0, Math.PI * 2);
+    }
+    c.strokeStyle = 'rgba(0,0,0,0.12)';
+    c.lineWidth = 1.5;
+    c.stroke();
+
+    // 잎사귀 / 꼭지
+    if (f.leafColor && !f.watermelon) {
+      c.save();
+      c.translate(0, -r*0.92);
+      c.rotate(0.2);
+      c.beginPath();
+      c.ellipse(0, 0, r*0.28, r*0.14, 0, 0, Math.PI*2);
+      c.fillStyle = f.leafColor;
+      c.fill();
+      c.restore();
+      c.save();
+      c.translate(r*0.15, -r*0.95);
+      c.rotate(-0.3);
+      c.beginPath();
+      c.ellipse(0, 0, r*0.22, r*0.11, 0, 0, Math.PI*2);
+      c.fillStyle = f.leafColor;
+      c.fill();
+      c.restore();
+    }
+    if (f.watermelon) {
+      c.save();
+      c.translate(0, -r*0.95);
+      c.fillStyle = '#6b4226';
+      c.fillRect(-r*0.03, -r*0.15, r*0.06, r*0.2);
+      c.restore();
+    }
+
+    c.restore();
   }
 
-  function doDrop() {
-    if (!running || !canDrop || !currentFruit) return;
-    canDrop = false;
-    const f = currentFruit;
-    Body.setStatic(f, false);
-    f.isSensor = false;
-    currentFruit = null;
-
-    currentIndex = nextIndex;
-    nextIndex = randomStartIndex();
-    updateNextPreview();
-
-    setTimeout(() => {
-      if (!running) return;
-      spawnCurrentFruit();
-      canDrop = true;
-    }, 420);
+  function drawStrawberryShape(c, r) {
+    c.moveTo(0, -r*0.7);
+    c.bezierCurveTo(r*0.9, -r*0.9, r*1.05, r*0.1, 0, r*1.05);
+    c.bezierCurveTo(-r*1.05, r*0.1, -r*0.9, -r*0.9, 0, -r*0.7);
   }
 
-  canvas.addEventListener('mousemove', (e) => onMove(e.clientX));
-  canvas.addEventListener('click', () => doDrop());
-  canvas.addEventListener('touchmove', (e) => {
-    if (e.touches[0]) onMove(e.touches[0].clientX);
-    e.preventDefault();
-  }, { passive: false });
-  canvas.addEventListener('touchend', (e) => {
-    doDrop();
-    e.preventDefault();
-  }, { passive: false });
+  function lighten(hex, amt) {
+    const num = parseInt(hex.slice(1), 16);
+    let r = (num >> 16) + amt;
+    let g = ((num >> 8) & 0xff) + amt;
+    let b = (num & 0xff) + amt;
+    r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+    return `rgb(${r},${g},${b})`;
+  }
 
-  const merging = new Set();
+  function drawNextPreview() {
+    nextCtx.clearRect(0, 0, 50, 50);
+    const f = FRUITS[nextType];
+    const scale = Math.min(1, 18 / f.radius);
+    drawFruit(nextCtx, f, 25, 25, f.radius * scale);
+  }
 
-  function handleCollisions(event) {
-    event.pairs.forEach(pair => {
-      const a = pair.bodyA, b = pair.bodyB;
-      if (a.fruitIndex === undefined || b.fruitIndex === undefined) return;
-      if (a.isSensor || b.isSensor) return;
-      if (a.fruitIndex !== b.fruitIndex) return;
-      if (merging.has(a.id) || merging.has(b.id)) return;
-      if (a.fruitIndex >= FRUITS.length - 1) return; // already max (watermelon)
-
-      merging.add(a.id);
-      merging.add(b.id);
-
-      const newIndex = a.fruitIndex + 1;
-      const midX = (a.position.x + b.position.x) / 2;
-      const midY = (a.position.y + b.position.y) / 2;
-
-      World.remove(world, a);
-      World.remove(world, b);
-
-      const merged = fruitBody(midX, midY, newIndex);
-      World.add(world, merged);
-
-      score += FRUITS[newIndex].score;
-      scoreEl.textContent = score;
-
-      // little pop effect via scale animation
-      Body.scale(merged, 0.6, 0.6);
-      let scale = 0.6;
-      const grow = setInterval(() => {
-        scale += 0.08;
-        if (scale >= 1) {
-          Body.scale(merged, 1 / (scale - 0.08), 1 / (scale - 0.08));
-          clearInterval(grow);
-        } else {
-          Body.scale(merged, 1.08, 1.08);
-        }
-      }, 16);
+  // ---------- 물리 & 게임 로직 ----------
+  function addFruit(type, x, y) {
+    fruits.push({
+      type, x, y,
+      vx: 0, vy: 0,
+      r: FRUITS[type].radius,
+      merging: false,
+      settled: false
     });
   }
 
-  function drawOverlayElements() {
-    if (!render.context) return;
-    const ctx = render.context;
-    // danger line
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,107,107,0.5)';
-    ctx.setLineDash([6, 6]);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(WALL, DANGER_Y);
-    ctx.lineTo(W - WALL, DANGER_Y);
-    ctx.stroke();
-    ctx.restore();
+  function dropFruit() {
+    if (dropCooldown || !running) return;
+    const f = FRUITS[currentType];
+    const x = Math.min(Math.max(dropX, f.radius + 4), W - f.radius - 4);
+    addFruit(currentType, x, f.radius + DANGER_LINE * 0);
+    dropCooldown = true;
+    setTimeout(() => { dropCooldown = false; }, 250);
+
+    currentType = nextType;
+    nextType = pickNextType();
+    drawNextPreview();
   }
 
-  function checkGameOver() {
-    if (!running) return;
-    const bodies = Composite.allBodies(world).filter(b => b.fruitIndex !== undefined && !b.isSensor);
+  function pickNextType() {
+    // 낮은 등급일수록 더 자주 나오게
+    const maxIdx = Math.min(4, 3);
+    return Math.floor(Math.random() * (maxIdx + 1));
+  }
+
+  function update() {
+    // 물리 업데이트
+    for (let i = 0; i < fruits.length; i++) {
+      const f = fruits[i];
+      if (f.merging) continue;
+      f.vy += GRAVITY;
+      f.x += f.vx;
+      f.y += f.vy;
+
+      // 벽 충돌
+      if (f.x - f.r < 0) { f.x = f.r; f.vx *= -WALL_DAMPING; }
+      if (f.x + f.r > W) { f.x = W - f.r; f.vx *= -WALL_DAMPING; }
+      // 바닥 충돌
+      if (f.y + f.r > H) { f.y = H - f.r; f.vy *= -DAMPING; if (Math.abs(f.vy) < 0.5) f.vy = 0; }
+
+      f.vx *= 0.985;
+    }
+
+    // 충돌 처리 (단순 반복)
+    for (let i = 0; i < fruits.length; i++) {
+      for (let j = i + 1; j < fruits.length; j++) {
+        const a = fruits[i], b = fruits[j];
+        if (a.merging || b.merging) continue;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const minDist = a.r + b.r;
+
+        if (dist < minDist && dist > 0) {
+          if (a.type === b.type && a.type < FRUITS.length - 1) {
+            // 합체
+            a.merging = true; b.merging = true;
+            const nx = (a.x + b.x) / 2;
+            const ny = (a.y + b.y) / 2;
+            const newType = a.type + 1;
+            score += FRUITS[newType].score;
+            scoreEl.textContent = score;
+            spawnMergeEffect(nx, ny, FRUITS[newType].radius, FRUITS[newType].color[0]);
+            setTimeout(() => {
+              fruits = fruits.filter(x => x !== a && x !== b);
+              addFruit(newType, nx, ny);
+            }, 0);
+          } else {
+            // 겹침 밀어내기
+            const overlap = (minDist - dist) / 2;
+            const nx = dx / dist, ny = dy / dist;
+            a.x -= nx * overlap; a.y -= ny * overlap;
+            b.x += nx * overlap; b.y += ny * overlap;
+            const rel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+            if (rel > 0) {
+              a.vx -= rel * nx * 0.5; a.vy -= rel * ny * 0.5;
+              b.vx += rel * nx * 0.5; b.vy += rel * ny * 0.5;
+            }
+          }
+        }
+      }
+    }
+
+    // 게임오버 체크
     let overLine = false;
-    bodies.forEach(b => {
-      // only count if it has settled a bit (velocity low) to avoid false positive right after spawn
-      if (b.position.y - b.circleRadius < DANGER_Y && Math.abs(b.velocity.y) < 1.2) {
+    for (const f of fruits) {
+      if (f.y - f.r < DANGER_LINE && Math.abs(f.vy) < 0.6 && f.y > f.r) {
         overLine = true;
       }
-    });
-    if (overLine) {
-      dangerFrames++;
-    } else {
-      dangerFrames = 0;
     }
-    if (dangerFrames > 90) { // ~1.5s sustained
-      endGame();
+    if (overLine) {
+      dangerTimer++;
+      if (dangerTimer > 90) endGame();
+    } else {
+      dangerTimer = 0;
     }
   }
 
-  let gameOverCheckInterval = null;
+  let mergeEffects = [];
+  function spawnMergeEffect(x, y, r, color) {
+    mergeEffects.push({ x, y, r: r*0.3, maxR: r*1.4, color, life: 1 });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 위험선
+    ctx.save();
+    ctx.setLineDash([6, 6]);
+    ctx.strokeStyle = dangerTimer > 30 ? '#ff4d4d' : 'rgba(255,100,100,0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, DANGER_LINE);
+    ctx.lineTo(W, DANGER_LINE);
+    ctx.stroke();
+    ctx.restore();
+
+    // 과일들
+    for (const f of fruits) {
+      if (f.merging) continue;
+      drawFruit(ctx, FRUITS[f.type], f.x, f.y, f.r, f.vx * 0.01);
+    }
+
+    // 합체 이펙트
+    mergeEffects = mergeEffects.filter(e => e.life > 0);
+    for (const e of mergeEffects) {
+      ctx.save();
+      ctx.globalAlpha = e.life;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r + (1 - e.life) * e.maxR, 0, Math.PI*2);
+      ctx.strokeStyle = e.color;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+      e.life -= 0.06;
+    }
+
+    // 드롭 예고선 + 다음 과일
+    if (running) {
+      const f = FRUITS[currentType];
+      const x = Math.min(Math.max(dropX, f.radius + 4), W - f.radius - 4);
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.setLineDash([4, 6]);
+      ctx.strokeStyle = '#a56bff';
+      ctx.beginPath();
+      ctx.moveTo(x, DANGER_LINE);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      drawFruit(ctx, f, x, 45, f.radius);
+      ctx.restore();
+    }
+  }
+
+  function loop() {
+    if (!running) return;
+    update();
+    draw();
+    animId = requestAnimationFrame(loop);
+  }
 
   function endGame() {
     running = false;
-    canDrop = false;
-    if (gameOverCheckInterval) clearInterval(gameOverCheckInterval);
+    cancelAnimationFrame(animId);
     if (score > highscore) {
       highscore = score;
       highscoreEl.textContent = highscore;
-      try { localStorage.setItem('suika_highscore', highscore); } catch(e) {}
+      try { localStorage.setItem('watermelon_highscore', highscore); } catch(e) {}
     }
     finalScoreText.textContent = `점수: ${score}`;
     gameOverOverlay.classList.remove('hidden');
-    teardown();
   }
 
   function startGame() {
     startOverlay.classList.add('hidden');
     gameOverOverlay.classList.add('hidden');
-    setup();
-    gameOverCheckInterval = setInterval(checkGameOver, 16);
+    initState();
+    running = true;
+    loop();
   }
+
+  // ---------- 입력 처리 ----------
+  function getX(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return (clientX - rect.left) * (W / rect.width);
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!running) return;
+    dropX = getX(e);
+  });
+  canvas.addEventListener('click', (e) => {
+    if (!running) return;
+    dropX = getX(e);
+    dropFruit();
+  });
+  canvas.addEventListener('touchmove', (e) => {
+    if (!running) return;
+    dropX = getX(e);
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener('touchend', (e) => {
+    if (!running) return;
+    dropFruit();
+    e.preventDefault();
+  }, { passive: false });
 
   startBtn.addEventListener('click', startGame);
   restartBtn.addEventListener('click', startGame);
+
+  // 초기 정적 화면
+  initState();
+  draw();
 })();
 </script>
 
