@@ -1,172 +1,500 @@
 <!DOCTYPE html>
-<!--
-  Nexus System Template
-  https://templatemo.com/tm-629-nexus-system
--->
-<html lang="en">
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexus System - Industrial Tech HTML Template</title>
-<meta name="description" content="The Nexus is a Z-Depth scroll-stacking industrial tech template with a brushed titanium and acid volt design system.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="templatemo-629-nexus-style.css">
-<link rel="icon" type="image/x-icon" href="./images/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captain Kirrard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="./images/ball.png">
+    <style>
+        :root {
+            --primary-color: #b30838;   
+            --accent-color: #ffce00;
+            --dark-color: #1a1a1a;
+            --light-bg: #f7f7f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            color: var(--dark-color);
+            background: var(--light-bg);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 40px 0;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .site-header .logo img {
+            width: 30px;
+            height: 40px;
+            display: block;
+        }
+
+        .site-header nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .site-header nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .site-header nav a:hover {
+            color: var(--accent-color);
+        }
+
+        .home {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        .home h2 {
+            font-family: "Nanum Brush Script", sans-serif;
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 24px;
+        }
+
+        .home h2 strong {
+            color: var(--primary-color);
+        }
+
+        .home img {
+            width: 100%;
+            max-width: 480px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .section {
+            padding: 20px 0 40px;
+        }
+
+        .section h2 {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 1.6rem;
+            border-left: 6px solid var(--primary-color);
+            padding-left: 12px;
+            margin-bottom: 24px;
+        }
+
+        #intro {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        #intro h2 {
+            width: 100%;
+        }
+
+        .profile-img {
+            width: 220px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        #intro table {
+            flex: 1;
+            min-width: 260px;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        #intro th, #intro td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        #intro th {
+            width: 90px;
+            background: #fafafa;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        #intro td img {
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        #highlight {
+            text-align: center;
+        }
+
+        #highlight iframe {
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 16 / 9;
+            height: auto;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        #TK .clubex {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-top: 4px solid var(--accent-color);
+        }
+
+        .warp {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            padding: 0;
+            }
+
+        .clubex {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .clubex .years {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .clubex .club-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .clubex .club-note {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        #stat table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        #stat th, #stat td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9rem;
+            vertical-align: top;
+        }
+
+        #stat th {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        #award ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        #award li {
+            background: #fff;
+            border-radius: 8px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            font-size: 0.92rem;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 12px;
+        }
+
+        .site-footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 <body>
 
-<div class="scroll-spacer" aria-hidden="true"></div>
+<header class="site-header">
+    <div class="logo"><img src="https://i.namu.wiki/i/em3ZalV4JpyWO1WoaVBbQP62ue7qfLhBTNef12ZHu9BAXJDR_4k4i4T3dyPoxOMHoveQ6wJJQNrDQLg-ZhRmTw.svg" alt="로고"></div>
+    <nav>
+        <a href="#home">HOME</a>
+        <a href="#intro">소개</a>
+        <a href="#highlight">하이라이트</a>
+        <a href="#club">클럽 경력</a>
+        <a href="#TK">국가 대표 경력</a>
+        <a href="#stat">통산 기록</a>
+        <a href="#award">수상 이력</a>
+    </nav>
+</header>
 
-<!-- card 1: the floating hero -->
-<section class="zcard card-hero" data-card="1">
-  <div class="hero-grid" aria-hidden="true"></div>
-  <div class="glass-shape glass-a" aria-hidden="true"></div>
-  <div class="glass-shape glass-b" aria-hidden="true"></div>
-  <div class="glass-shape glass-c" aria-hidden="true"></div>
-  <div class="hero-stage">
-    <p class="hero-eyebrow">WEB Page 공부중</p>
-    <h1 class="hero-title">광명 폴리텍</h1>
-    <p class="hero-sub">실습 테스트용 텍스트</p>
-  </div>
-  <div class="hero-scroll-hint">Scroll to descend</div>
-</section>
+<main>
+<div class="container">
+    <section class="home" id="home">
+        <h2>"답답하면 니들이 <strong>뛰던지</strong>"</h2>
+        <img src="https://mblogthumb-phinf.pstatic.net/MjAxOTA2MTdfMjg0/MDAxNTYwNzc1MzMxNDU3.D9-Qp6WqdVhAKWKSsdS1Z2Hjshf_EYKa5Ul2h3LiBj8g.Etgg9DQfpnN0f283Fzhw8TE9MMFwfcPTkxOiRyUnaVwg.JPEG.any413way/5.jpg?type=w800" alt="답답하면 니들이 뛰던지" class="profile-img">
+    </section>
+    
+    <hr>
 
-<!-- card 2: the engineered image overlay -->
-<section class="zcard card-macro" data-card="2">
-  <img class="macro-img" src="images/nexus-macro.jpg" alt="Macro view of the Nexus core module">
-  <div class="macro-shade" aria-hidden="true"></div>
-  <div class="crosshair-v" aria-hidden="true"></div>
-  <div class="crosshair-h" aria-hidden="true"></div>
-  <div class="node-dot" aria-hidden="true"></div>
-  <div class="node-box">
-    <p class="node-box-tag">NODE / NX-07 TELEMETRY</p>
-    <div class="node-stat"><span>EFFICIENCY</span><span>98.4%</span></div>
-    <div class="node-stat"><span>THERMAL DELTA</span><span>-12.6 C</span></div>
-    <div class="node-stat"><span>SYNC LATENCY</span><span>0.8 ms</span></div>
-  </div>
-  <div class="macro-caption">
-    <span class="mono">02 / Engineered in the open</span>
-    <h2>Every micron is accounted for.</h2>
-  </div>
-</section>
+    <section class="section" id="intro">
+        <h2>선수 소개</h2>
+        <img src="https://i.namu.wiki/i/xLoyCxHBxcmxlL0XrfpKTtbKSDg5USs5mKUPYA5Fa_Z-KS859Egi1Vq1nYcn8P5AlV1y_rlp7UXodCAX3kYHtcoIGs6yG9AyeVs-YPFlyuTAZivpdaJJen3CTFRVwcccEdBUVCFQHGm11OzdPPA6fg.webp" alt="기성용 프로필사진" class="profile-img">
+        <table>
+            <tbody>
+                <tr>
+                    <th>이름</th>
+                    <td>기성용 (Ki Sung-yueng)</td>
+                </tr>
+                <tr>
+                    <th rowspan="2">출생</th>
+                    <td>1989년 1월 24일 (37세)</td>
+                </tr>
+                <tr>
+                    <td>광주직할시 광산구 임곡동</td>
+                </tr>
+                <tr>
+                    <th>국적</th>
+                    <td><img src="https://i.namu.wiki/i/T-bX1uxLwYZVzDmE9nNGX1pZSLo31NlUsvLoL-RY46ASpZUKe7jPGeTorKtSJO0Ss0JRXPr71eQHXoVrnJlei9_bAcsMyemZ2PhgqjztW6BsB8ccXIuMbjvqKC6xVcc7RypiuA_PgcKSYwNo3TxqOA.svg" style="width: 20px;">대한민국</td>
+                </tr>
+                <tr>
+                    <th>본관</th>
+                    <td>행주 기씨 (幸州 奇氏)</td>
+                </tr>
+                <tr>
+                    <th>신체</th>
+                    <td>189cm, 77kg, O형</td>
+                </tr>
+                <tr>
+                    <th>포지션</th>
+                    <td>미드필더</td>
+                </tr>
+                <tr>
+                    <th>주발</th>
+                    <td>오른발 (양발)</td>
+                </tr>
+                <tr>
+                    <th>소속</th>
+                    <td>포항 스틸러스</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-<!-- card 3: the kinetic accordion fold -->
-<section class="zcard card-fold" data-card="3">
-  <div class="fold-head">
-    <h2>Four systems. One spine.</h2>
-    <span class="mono">03 / Hover or tap a column</span>
-  </div>
-  <div class="accordion" id="accordion">
-    <button class="slice" type="button" aria-expanded="false">
-      <img class="slice-img" src="images/nexus-core.jpg" alt="Core processing array">
-      <div class="slice-shade" aria-hidden="true"></div>
-      <div class="slice-idle">
-        <span class="slice-num">A.01</span>
-        <span class="slice-idle-title">Core Array</span>
-        <span class="slice-num" aria-hidden="true">+</span>
-      </div>
-      <div class="slice-reveal">
-        <span class="mono">A.01 / Compute</span>
-        <h3>Core Array</h3>
-        <p>Sixty-four hot-swappable compute blades aligned on a single coherent fabric, tuned for sustained full-load operation.</p>
-      </div>
-    </button>
-    <button class="slice" type="button" aria-expanded="false">
-      <img class="slice-img" src="images/nexus-flux.jpg" alt="Liquid cooling fluidics loop">
-      <div class="slice-shade" aria-hidden="true"></div>
-      <div class="slice-idle">
-        <span class="slice-num">A.02</span>
-        <span class="slice-idle-title">Fluidics</span>
-        <span class="slice-num" aria-hidden="true">+</span>
-      </div>
-      <div class="slice-reveal">
-        <span class="mono">A.02 / Thermal</span>
-        <h3>Fluidics Loop</h3>
-        <p>A sealed dielectric loop moves heat away from silicon at the source, holding the entire rack within a two degree band.</p>
-      </div>
-    </button>
-    <button class="slice" type="button" aria-expanded="false">
-      <img class="slice-img" src="images/nexus-grid.jpg" alt="Power distribution grid">
-      <div class="slice-shade" aria-hidden="true"></div>
-      <div class="slice-idle">
-        <span class="slice-num">A.03</span>
-        <span class="slice-idle-title">Power Grid</span>
-        <span class="slice-num" aria-hidden="true">+</span>
-      </div>
-      <div class="slice-reveal">
-        <span class="mono">A.03 / Energy</span>
-        <h3>Power Grid</h3>
-        <p>Redundant busbars and solid-state switching deliver clean power with zero transfer time when a feed drops.</p>
-      </div>
-    </button>
-    <button class="slice" type="button" aria-expanded="false">
-      <img class="slice-img" src="images/nexus-sync.jpg" alt="Optical interconnect sync layer">
-      <div class="slice-shade" aria-hidden="true"></div>
-      <div class="slice-idle">
-        <span class="slice-num">A.04</span>
-        <span class="slice-idle-title">Sync Layer</span>
-        <span class="slice-num" aria-hidden="true">+</span>
-      </div>
-      <div class="slice-reveal">
-        <span class="mono">A.04 / Network</span>
-        <h3>Sync Layer</h3>
-        <p>Optical interconnects keep every node phase-locked, so distributed workloads behave like a single machine.</p>
-      </div>
-    </button>
-  </div>
-</section>
+    <hr>
+    
+    <section class="section highlight" id="highlight">
+        <h2>선수 하이라이트</h2>
+        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/BTjSjGkRNP0?si=PSZu4-t5WkWz-vCh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </section>
 
-<!-- card 4: the matrix tabs and signature -->
-<section class="zcard card-matrix" data-card="4">
-  <div class="matrix-left">
-    <p class="mono-tag">04 / Inside the platform</p>
-    <h2>Built as a matrix, not a stack.</h2>
-    <div class="matrix-tabs">
-      <button class="matrix-tab active" type="button" data-goto="core" aria-selected="true">
-        <span class="tab-line"><span class="tab-num">01.</span><span class="tab-name">CORE</span></span>
-        <p>The structural heart of the Nexus. A milled aluminum frame that locates every module to within five microns.</p>
-      </button>
-      <button class="matrix-tab" type="button" data-goto="fluidics" aria-selected="false">
-        <span class="tab-line"><span class="tab-num">02.</span><span class="tab-name">FLUIDICS</span></span>
-        <p>Quick-disconnect manifolds route coolant through the chassis without a single exposed line.</p>
-      </button>
-      <button class="matrix-tab" type="button" data-goto="sync" aria-selected="false">
-        <span class="tab-line"><span class="tab-num">03.</span><span class="tab-name">SYNC</span></span>
-        <p>A dedicated timing plane distributes a single clock to all nodes, end to end, rack to rack.</p>
-      </button>
-    </div>
-  </div>
-  <div class="matrix-right">
-    <img class="matrix-img active" data-panel="core" src="images/nexus-tab-core.jpg" alt="The Nexus core frame">
-    <img class="matrix-img" data-panel="fluidics" src="images/nexus-tab-fluidics.jpg" alt="The Nexus fluidics manifold">
-    <img class="matrix-img" data-panel="sync" src="images/nexus-tab-sync.jpg" alt="The Nexus sync timing plane">
-    <div class="matrix-img-shade" aria-hidden="true"></div>
-    <div class="matrix-caption" id="matrixCaption">FIG. 01 / CORE FRAME</div>
-  </div>
-</section>
+    <hr>
 
-<!-- permanent hud signature bar -->
-<footer class="hud">
-  <a class="hud-brand" href="https://www.templatemo.com/tm-629-nexus-system" target="_blank" rel="nofollow noopener">
-    <span class="dot" aria-hidden="true"></span>Nexus System
-  </a>
-  <span class="hud-credit">FREE CSS TEMPLATES / <a href="https://templatemo.com" target="_blank" rel="nofollow noopener">TEMPLATEMO</a></span>
-  <div class="hud-progress">
-    <div class="hud-track"><div class="hud-fill" id="hudFill"></div></div>
-    <span class="hud-pct" id="hudPct">000%</span>
-  </div>
-  <div class="hud-nav">
-    <button class="hud-arrow" id="navUp" type="button" aria-label="Previous section">
-      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 9L7 4L12 9" stroke="currentColor" stroke-width="1.5"/></svg>
-    </button>
-    <button class="hud-arrow" id="navDown" type="button" aria-label="Next section">
-      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 5L7 10L12 5" stroke="currentColor" stroke-width="1.5"/></svg>
-    </button>
-  </div>
+    <section class="section" id="club">
+        <h2>클럽 경력</h2>
+        <div class="warp">
+            <div class="clubex">
+                <div class="years">2004 ~ 2009</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRK8N9IcN6CY7an9Jr5q-QhkCS2OQOaoLZ8AaVLk0haCg&s=10" style="width: 40px; height: 40px;" alt="fc 서울">FC 서울</div>
+                <div class="club-note">K리그 데뷔, 최연소 베스트 11 기록</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2010 ~ 2012</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAdX3xip_0nY0Gx6h04FuRyoYMx6qSS8G_URYNqWwCpw&s" style="width: 40px; height: 40px;" alt="셀틱 fc">셀틱 (스코틀랜드)</div>
+                <div class="club-note">유럽 무대 진출, 주전 미드필더 도약</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2012 ~ 2018</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxhtUxGAnzA1nwZe6X3WS9JbD17q3wgUGK0QX172SZrA&s=10" style="width: 40px; height: 40px;" alt="스완지 시티 로고">스완지 시티 (잉글랜드)</div>
+                <div class="club-note">프리미어리그 정착</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2018 ~ 2020</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGypKR5lhCQRIo-RTkxxR1WHrwXAOkf9S55UeShB8TeQ&s=10" style="width: 40px; height: 40px;" alt="뉴캐슬 UT">뉴캐슬 유나이티드 (잉글랜드)</div>
+                <div class="club-note">프리미어리그에서의 마지막</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2020</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFc80nLc_YMwdP3HunvSJyRR30LgtGJPzyqO2BsOfEbg&s" style="width: 40px; height: 40px;" alt="RCD 마요르카">RCD 마요르카 (스페인, 임대)</div>
+                <div class="club-note">라리가 경험</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2020 ~ 2025</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRK8N9IcN6CY7an9Jr5q-QhkCS2OQOaoLZ8AaVLk0haCg&s=10" style="width: 40px; height: 40px;" alt="fc 서울">FC서울 (복귀)</div>
+                <div class="club-note">주장으로 팀을 이끔</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2025 ~ 현재</div>
+                <div class="club-name"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzQpHvljiEke4yetwxjAajrmZ_bswj1ABV3VcFdBVtkQ&s" style="width: 40px; height: 40px;" alt="포항 스틸러스">포항 스틸러스</div>
+                <div class="club-note">현재 소속 팀</div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="section" id="TK">
+        <h2>국가 대표 경력</h2>
+        <div class="warp">
+            <div class="clubex">
+                <div class="years">2008 ~ 2019</div>
+                <div class="club-name">대한민국 축구 국가대표팀</div>
+                <div class="club-note">A매치 110경기 출전, 국가대표 주장</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2010 · 2014 · 2018</div>
+                <div class="club-name">FIFA 월드컵 본선 3회 출전</div>
+                <div class="club-note">남아공 · 브라질 · 러시아</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2008 · 2012</div>
+                <div class="club-name">베이징, 런던 올림픽</div>
+                <div class="club-note">동메달, 병역 면제</div>
+            </div>
+            <div class="clubex">
+                <div class="years">2015</div>
+                <div class="club-name">AFC 아시안컵</div>
+                <div class="club-note">카타르 · 호주 · UAE</div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="section" id="stat">
+        <h2>통산 기록</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>주요 내용</th>
+                    <th>통산 경기</th>
+                    <th>통산 득점</th>
+                    <th>통산 도움</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>A매치</td>
+                    <td>대한민국 국가대표 출전</td>
+                    <td>110경기</td>
+                    <td>10골</td>
+                    <td>국가대표 통산 도움 다수</td>
+                </tr>
+                <tr>
+                    <td>K리그</td>
+                    <td>FC서울 · 포항 스틸러스</td>
+                    <td>250경기</td>
+                    <td>15골</td>
+                    <td>26도움</td>
+                </tr>
+                <tr>
+                    <td>스코틀랜드 프리미어십</td>
+                    <td>셀틱</td>
+                    <td>87경기</td>
+                    <td>11골</td>
+                    <td>15도움</td>
+                </tr>
+                <tr>
+                    <td>잉글랜드 프리미어리그</td>
+                    <td>스완지 시티 · 뉴캐슬 유나이티드</td>
+                    <td>187경기</td>
+                    <td>15골</td>
+                    <td>10도움</td>
+                </tr>
+                <tr>
+                    <td>라리가</td>
+                    <td>RCD 마요르카 (임대)</td>
+                    <td>1경기</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <section class="section" id="award">
+        <h2>수상 이력</h2>
+        <ul>
+            <li>🎖️K리그 영플레이어상</li>
+            <li>K리그 베스트 11 2회 선정</li>
+            <li>🏆2010-11 스코티시 컵 우승</li>
+            <li>🏆2011-12 스코틀랜드 리그 우승</li>
+            <li>🥉2012 런던 올림픽 동메달</li>
+            <li>🏆2012-13 캐피털 원 컵 (리그컵) 우승</li>
+            <li>🥈AFC 아시안컵 준우승 (2015)</li>
+        </ul>
+    </section>
+
+</div>
+</main>
+
+<footer class="site-footer">
+    &copy; "리더는 묵직해야 한다."
 </footer>
 
-<script src="templatemo-629-nexus-script.js"></script>
+    
 </body>
 </html>
